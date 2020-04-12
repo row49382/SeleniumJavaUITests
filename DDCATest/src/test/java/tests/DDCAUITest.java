@@ -8,9 +8,11 @@ import org.testng.Reporter;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-import pom.DeltaDentalHomePage;
-import pom.GetAQuoteFormPage;
-import pom.GetAQuoteResultsPage;
+import pages.HomePage;
+import pages.GetAQuoteFormPage;
+import pages.GetAQuoteResultsPage;
+
+import java.util.stream.Stream;
 
 /**
  * UI Selenium Tests for the DDCA homepage
@@ -54,18 +56,19 @@ public class DDCAUITest {
         int zipCode = 94105;
         String birthdate = "06/10/1995";
 
-        DeltaDentalHomePage homePage = new DeltaDentalHomePage(this.driver, this.wait);
+        HomePage homePage = new HomePage(this.driver, this.wait);
         GetAQuoteFormPage getAQuoteFormPage = homePage.clickGetPlans();
 
         getAQuoteFormPage.enterFormData(zipCode, birthdate);
         GetAQuoteResultsPage getAQuoteResultsPage = getAQuoteFormPage.clickShowPlansButton();
 
-        String plans = getAQuoteResultsPage.getAllPlans()
+        Stream<String> plans = getAQuoteResultsPage.getAllPlans();
+        String formattedPlans = plans
                 // reduce the results to readable formatted string
                 .reduce("\nDelta Dental Plans Found: \n" , (x, y) -> x + y + "\n");
 
-        // using the TestNG reporting to write the console
-        Reporter.log(plans, true);
+        // using the TestNG Reporter class to write the available plans to the console
+        Reporter.log(formattedPlans, true);
         Assert.assertNotNull(plans, "no plans were found");
     }
 }
